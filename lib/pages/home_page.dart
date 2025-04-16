@@ -1,3 +1,6 @@
+import 'package:book_tracker/pages/estante_page.dart';
+import 'package:book_tracker/pages/feed_page.dart';
+import 'package:book_tracker/pages/pesquisa_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -28,11 +31,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.blueGrey[50],
+        color: Colors.grey[100],
         child: PageView(
           controller: pc,
           onPageChanged: setPaginaAtual,
-          //children: [],
+          children: [FeedPage(), SearchPage(), BookshelfPage()],
         ),
       ),
       appBar: AppBar(
@@ -47,7 +50,6 @@ class _HomePageState extends State<HomePage> {
             Text(' Book Tracker'),
           ],
         ),
-        backgroundColor: Colors.white,
         titleTextStyle: TextStyle(
           fontFamily: GoogleFonts.crimsonPro().fontFamily,
           fontSize: 30,
@@ -62,6 +64,7 @@ class _HomePageState extends State<HomePage> {
         currentIndex: paginaAtual,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Feed'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Pesquisa'),
           BottomNavigationBarItem(icon: Icon(Icons.shelves), label: 'Estante'),
         ],
         onTap: (pagina) {
