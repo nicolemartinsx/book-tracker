@@ -42,11 +42,7 @@ class _HomePageState extends State<HomePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.menu_book_rounded,
-              color: Colors.blueGrey[900],
-              size: 30,
-            ),
+            Icon(Icons.menu_book_sharp, color: Colors.blueGrey[800], size: 30),
             Text(' Book Tracker'),
           ],
         ),
@@ -54,7 +50,7 @@ class _HomePageState extends State<HomePage> {
           fontFamily: GoogleFonts.crimsonPro().fontFamily,
           fontSize: 30,
           fontWeight: FontWeight.bold,
-          color: Colors.blueGrey[900],
+          color: Colors.blueGrey[800],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
