@@ -1,3 +1,4 @@
+import 'package:book_tracker/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
 class BookshelfPage extends StatefulWidget {
@@ -10,21 +11,43 @@ class BookshelfPage extends StatefulWidget {
 class _BookshelfPageState extends State<BookshelfPage> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(5, 200, 5, 25),
-          child: Center(
-            child: Text(
-              'Acesse sua conta para visualizar sua estante',
-              style: TextStyle(fontSize: 20),
-              textAlign: TextAlign.center,
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(5, 200, 5, 25),
+            child: Center(
+              child: Text(
+                'Acesse sua conta para visualizar sua estante',
+                style: TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: ElevatedButton(
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                backgroundColor: Colors.blueGrey[900],
+                padding: EdgeInsets.fromLTRB(20, 12, 20, 12),
+              ),
+              child: Text(
+                'LOGIN',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ),
+          ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
@@ -34,26 +57,12 @@ class _BookshelfPageState extends State<BookshelfPage> {
               padding: EdgeInsets.fromLTRB(20, 12, 20, 12),
             ),
             child: Text(
-              'LOGIN',
+              'CADASTRAR',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
-        ),
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            backgroundColor: Colors.blueGrey[900],
-            padding: EdgeInsets.fromLTRB(20, 12, 20, 12),
-          ),
-          child: Text(
-            'CADASTRAR',
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
