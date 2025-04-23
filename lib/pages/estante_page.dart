@@ -20,7 +20,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
             child: Center(
               child: Text(
                 'Acesse sua conta para visualizar sua estante',
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -42,23 +42,9 @@ class _BookshelfPageState extends State<BookshelfPage> {
                 padding: EdgeInsets.fromLTRB(20, 12, 20, 12),
               ),
               child: Text(
-                'LOGIN',
+                'Faça Login ou Cadastre-se',
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              backgroundColor: Colors.blueGrey[900],
-              padding: EdgeInsets.fromLTRB(20, 12, 20, 12),
-            ),
-            child: Text(
-              'CADASTRAR',
-              style: TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
         ],
