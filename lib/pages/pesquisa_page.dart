@@ -33,10 +33,7 @@ class _SearchPageState extends State<SearchPage> {
                         borderSide: BorderSide(color: Colors.black87, width: 2),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.blueGrey,
-                          width: 3,
-                        ),
+                        borderSide: BorderSide(color: Colors.teal, width: 3),
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),

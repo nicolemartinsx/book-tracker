@@ -1,5 +1,6 @@
+import 'package:book_tracker/app_bar.dart';
+import 'package:book_tracker/pages/cadastro_page.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -9,26 +10,20 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final TextEditingController senhaController = TextEditingController();
+  bool _obscureText = true;
+
+  void _toggleVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        centerTitle: true,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.menu_book_sharp, color: Colors.blueGrey[800], size: 30),
-            Text(' Book Tracker'),
-          ],
-        ),
-        titleTextStyle: TextStyle(
-          fontFamily: GoogleFonts.crimsonPro().fontFamily,
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-          color: Colors.blueGrey[800],
-        ),
-      ),
+      appBar: buildCustomAppBar('Book Tracker'),
       body: Center(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -37,30 +32,28 @@ class _LoginPageState extends State<LoginPage> {
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Login',
-                  labelStyle: TextStyle(color: Colors.black54),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.black87, width: 2),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blueGrey, width: 3),
-                    borderRadius: BorderRadius.circular(8),
+                  labelStyle: TextStyle(color: Colors.black87),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.teal, width: 2),
                   ),
                 ),
                 onTapOutside: (event) => FocusScope.of(context).unfocus(),
               ),
               SizedBox(height: 24),
               TextField(
+                controller: senhaController,
+                obscureText: _obscureText,
                 decoration: InputDecoration(
                   labelText: 'Senha',
-                  labelStyle: TextStyle(color: Colors.black54),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.black87, width: 2),
+                  labelStyle: TextStyle(color: Colors.black87),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.teal, width: 2),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blueGrey, width: 3),
-                    borderRadius: BorderRadius.circular(8),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: _toggleVisibility,
                   ),
                 ),
                 onTapOutside: (event) => FocusScope.of(context).unfocus(),
@@ -90,19 +83,24 @@ class _LoginPageState extends State<LoginPage> {
                   "ESQUECI A SENHA",
                   style: TextStyle(
                     color: Colors.teal,
-                    fontSize: 16,
+                    fontSize: 14,
                     decoration: TextDecoration.underline,
                     decorationColor: Colors.teal,
                   ),
                 ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CadastroPage()),
+                  );
+                },
                 child: Text(
                   "Não possui uma conta? Cadastre-se",
                   style: TextStyle(
                     color: Colors.teal,
-                    fontSize: 16,
+                    fontSize: 14,
                     decoration: TextDecoration.underline,
                     decorationColor: Colors.teal,
                   ),
