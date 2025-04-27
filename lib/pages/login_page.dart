@@ -1,5 +1,7 @@
 import 'package:book_tracker/app_bar.dart';
 import 'package:book_tracker/pages/cadastro_page.dart';
+import 'package:book_tracker/pages/estante_page.dart';
+import 'package:book_tracker/pages/home_page.dart';
 import 'package:book_tracker/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +27,12 @@ class _LoginPageState extends State<LoginPage> {
   login() async {
     try{
       await context.read<AuthService>().login(loginController.text, senhaController.text);
+
+         Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+      
     }on AuthException catch(e){
        ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(e.message) ));
