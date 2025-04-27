@@ -1,3 +1,5 @@
+import 'package:book_tracker/models/livro.dart';
+import 'package:book_tracker/repositories/livro_repository.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
@@ -5,9 +7,41 @@ class SearchPage extends StatefulWidget {
 
   @override
   State<SearchPage> createState() => _SearchPageState();
+  
 }
 
 class _SearchPageState extends State<SearchPage> {
+
+
+final TextEditingController searchController = TextEditingController();
+
+List<Livro> allBooks = LivroRepository.livros;
+List<Livro> searchResults = [];
+
+
+@override
+void initState() {
+  super.initState();
+  searchResults = allBooks.take(5).toList(); // Mostra 5 livros logo de cara
+}
+
+
+void _searchBooks() {
+  String query = searchController.text.trim().toLowerCase();
+
+  setState(() {
+    if (query.isEmpty) {
+      searchResults = allBooks.take(5).toList();
+    } else {
+      searchResults = allBooks.where((livro) {
+        return livro.titulo.toLowerCase().contains(query) ||
+               livro.autor.toLowerCase().contains(query) ||
+               livro.id.contains(query);
+      }).toList();
+    }
+  });
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,6 +60,7 @@ class _SearchPageState extends State<SearchPage> {
               children: [
                 Expanded(
                   child: TextField(
+                    controller: searchController,
                     decoration: InputDecoration(
                       hintText: "Autor, Título ou ISBN",
                       enabledBorder: OutlineInputBorder(
@@ -37,14 +72,15 @@ class _SearchPageState extends State<SearchPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
+                    onChanged: (value) => _searchBooks(),
                     onTapOutside: (event) => FocusScope.of(context).unfocus(),
                   ),
                 ),
                 SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    // lógica de busca
-                  },
+              
+              
+             /*   ElevatedButton(
+                  onPressed: _searchBooks,  //função lá em cima
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -53,9 +89,27 @@ class _SearchPageState extends State<SearchPage> {
                     padding: EdgeInsets.symmetric(vertical: 13),
                   ),
                   child: Icon(Icons.search, color: Colors.white, size: 30),
-                ),
+                ), 
+            */
               ],
             ),
+
+            SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: searchResults.length,
+                itemBuilder: (context, index) {
+                  final livro = searchResults[index];
+                  return ListTile(
+                    //leading: Image.asset(livro.icone, width: 50, height: 50),
+                    title: Text(livro.titulo),
+                    subtitle: Text(livro.autor),
+                  );
+                },
+              ),
+            ),
+
+
           ],
         ),
       ),
