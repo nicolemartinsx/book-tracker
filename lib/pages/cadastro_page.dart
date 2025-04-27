@@ -1,6 +1,8 @@
 import 'package:book_tracker/app_bar.dart';
 import 'package:book_tracker/pages/login_page.dart';
+import 'package:book_tracker/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CadastroPage extends StatefulWidget {
   const CadastroPage({super.key});
@@ -10,8 +12,28 @@ class CadastroPage extends StatefulWidget {
 }
 
 class _CadastroPageState extends State<CadastroPage> {
+
+  final loginController = TextEditingController();
+  final nameController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
   bool _obscureText = true;
+
+
+
+
+  registrar() async {
+    try{
+      await context.read<AuthService>().registrar(loginController.text, senhaController.text, nameController.text);
+    }on AuthException catch(e){
+       ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(e.message) ));
+    }
+
+  }
+
+
+
+
 
   void _toggleVisibility() {
     setState(() {
@@ -30,6 +52,7 @@ class _CadastroPageState extends State<CadastroPage> {
           child: Column(
             children: [
               TextField(
+                controller: loginController,
                 decoration: InputDecoration(
                   labelText: 'Email',
                   labelStyle: TextStyle(color: Colors.black87),
@@ -41,6 +64,7 @@ class _CadastroPageState extends State<CadastroPage> {
               ),
               SizedBox(height: 24),
               TextField(
+                controller: nameController,
                 decoration: InputDecoration(
                   labelText: 'Username',
                   labelStyle: TextStyle(color: Colors.black87),
@@ -71,7 +95,9 @@ class _CadastroPageState extends State<CadastroPage> {
               ),
               SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  registrar();
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueGrey[900],
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 14),

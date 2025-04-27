@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "645845102508",
+    "project_id": "book-tracker-c2144",
+    "storage_bucket": "book-tracker-c2144.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645845102508:android:b4e6f280ebb2e2ac7b9409",
+        "android_client_info": {
+          "package_name": "com.example.book_tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0HLz6F6Q7CIYRnfuDnN7yrTMrSCzAqFI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
