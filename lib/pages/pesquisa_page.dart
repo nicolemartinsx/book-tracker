@@ -1,4 +1,5 @@
 import 'package:book_tracker/models/livro.dart';
+import 'package:book_tracker/pages/livro_page.dart';
 import 'package:book_tracker/repositories/livro_repository.dart';
 import 'package:flutter/material.dart';
 
@@ -100,16 +101,21 @@ void _searchBooks() {
                 itemCount: searchResults.length,
                 itemBuilder: (context, index) {
                   final livro = searchResults[index];
-                  return ListTile(
-                    //leading: Image.asset(livro.icone, width: 50, height: 50),
-                    title: Text(livro.titulo),
-                    subtitle: Text(livro.autor),
+                return ListTile(
+                  title: Text(livro.titulo),
+                  subtitle: Text(livro.autor),
+                  onTap: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                  builder: (context) => LivroDetalhePage(livro: livro),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
             ),
-
-
           ],
         ),
       ),
