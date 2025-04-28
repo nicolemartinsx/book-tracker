@@ -35,6 +35,9 @@ dependencies:
 
   firebase_core: ^2.27.0
   firebase_auth: ^4.17.5 
+
+  smooth_star_rating_null_safety: ^1.0.4
+
   
 
 
