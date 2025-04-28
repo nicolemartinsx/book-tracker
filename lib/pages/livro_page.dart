@@ -1,19 +1,20 @@
 import 'package:book_tracker/pages/review_page.dart';
+import 'package:book_tracker/repositories/review_repository.dart';
 import 'package:book_tracker/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:book_tracker/models/livro.dart';
 import 'package:provider/provider.dart';
 
 class LivroDetalhePage extends StatelessWidget {
-
-
   final Livro livro;
- 
+
   const LivroDetalhePage({super.key, required this.livro});
-  
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final usuario = authService.usuario?.uid;
+
     return Scaffold(
       backgroundColor: Colors.grey[50], // igual a SearchPage
       appBar: AppBar(
@@ -21,111 +22,128 @@ class LivroDetalhePage extends StatelessWidget {
         elevation: 1,
         title: Text(
           'Detalhes do Livro',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
         ),
-        iconTheme: IconThemeData(color: Colors.black),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              livro.titulo,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              livro.autor,
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black54,
-              ),
-            ),
-          SizedBox(height: 16),
-            Container(
-              height: 100, 
-              color: Colors.grey[200], 
-              child: Center(
-                child: Text(
-                  'Descrição do livro',
-                  style: TextStyle(color: Colors.black54),
+            Center(
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 20),
+                width: 200,
+                height: 300,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(livro.icone),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
 
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                  final authService = Provider.of<AuthService>(context, listen: false);
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  livro.titulo,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
 
-                if (authService.usuario != null) //usado para verificar se o usuario está logado
-                {
-                  //Ação de adicionar
-                } 
-                else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Você precisa estar logado para realizar esta ação.'),
-                      backgroundColor: Colors.redAccent,
+                Text(
+                  livro.autor,
+                  style: TextStyle(fontSize: 18, color: Colors.black54),
+                ),
+                SizedBox(height: 22),
+              ],
+            ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    final authService = Provider.of<AuthService>(
+                      context,
+                      listen: false,
+                    );
+                    if (authService.usuario != null) {
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Você precisa estar logado para realizar esta ação.',
+                          ),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueGrey[900],
+
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ); 
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey[900],
-                padding: EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'Adicionar',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
-              ),
+
+                SizedBox(width: 20),
+                OutlinedButton(
+                  onPressed: () {
+                    if (ReviewRepository.hasReviewed(livro.id, usuario!)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Você já resenhou este livro.'),
+                          backgroundColor: Colors.orangeAccent,
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => ReviewPage(
+                                idLivro: livro.id,
+                                livroTitulo: livro.titulo,
+                              ),
+                        ),
+                      );
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Criar Resenha',
+                    style: TextStyle(fontSize: 16, color: Colors.blueGrey[900]),
+                  ),
+                ),
+              ],
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 26),
               child: Text(
-                'Adicionar',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            OutlinedButton(
-              onPressed: () {
-                 final authService = Provider.of<AuthService>(context, listen: false);
-
-                if (authService.usuario != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReviewPage(livroTitulo: livro.titulo),
-                    ),
-                  );
-                } else {
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Você precisa estar logado para realizar esta ação.'),
-                      backgroundColor: Colors.redAccent,
-                    ),
-                  ); 
-                }
-              },
-              style: OutlinedButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'Fazer Resenha',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.blueGrey[900],
-                ),
+                livro.sinopse,
+                style: TextStyle(fontSize: 16),
+                textAlign: TextAlign.justify,
               ),
             ),
           ],
