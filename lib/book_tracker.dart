@@ -1,4 +1,5 @@
-import 'package:book_tracker/pages/home_page.dart';
+import 'package:book_tracker/pages/login_page.dart';
+
 import 'package:flutter/material.dart';
 
 class BookTracker extends StatelessWidget {
@@ -20,7 +21,7 @@ class BookTracker extends StatelessWidget {
           ),
         ),
       ),
-      home: HomePage(),
+      home: LoginPage(),
     );
   }
 }

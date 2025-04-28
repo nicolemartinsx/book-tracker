@@ -1,6 +1,5 @@
 import 'package:book_tracker/app_bar.dart';
 import 'package:book_tracker/pages/cadastro_page.dart';
-import 'package:book_tracker/pages/estante_page.dart';
 import 'package:book_tracker/pages/home_page.dart';
 import 'package:book_tracker/services/auth_service.dart';
 import 'package:flutter/material.dart';
@@ -14,30 +13,29 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final formkey = GlobalKey<FormState>();
 
   final loginController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
 
-
-
   bool _obscureText = true;
 
   login() async {
-    try{
-      await context.read<AuthService>().login(loginController.text, senhaController.text);
-
-         Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+    try {
+      await context.read<AuthService>().login(
+        loginController.text,
+        senhaController.text,
       );
-      
-    }on AuthException catch(e){
-       ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(e.message) ));
-    }
 
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => HomePage()),
+        (Route<dynamic> route) => false,
+      );
+    } on AuthException catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
+    }
   }
 
   void _toggleVisibility() {
@@ -65,16 +63,13 @@ class _LoginPageState extends State<LoginPage> {
                     borderSide: BorderSide(color: Colors.teal, width: 2),
                   ),
                 ),
-        
 
                 keyboardType: TextInputType.emailAddress,
-                validator: (value){
-                  if(value!.isEmpty)
-                  return 'Informe o email corretamente';
+                validator: (value) {
+                  if (value!.isEmpty) return 'Informe o email corretamente';
                   return null;
                 },
                 onTapOutside: (event) => FocusScope.of(context).unfocus(),
-
               ),
               SizedBox(height: 24),
               TextFormField(
@@ -94,22 +89,18 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-                  validator: (value){
-                  if(value!.isEmpty)
-                  return 'Informe a senha corretamente';
+                validator: (value) {
+                  if (value!.isEmpty) return 'Informe a senha corretamente';
                   return null;
                 },
 
                 onTapOutside: (event) => FocusScope.of(context).unfocus(),
               ),
 
-
-
-
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                   login();
+                  login();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueGrey[900],
@@ -128,9 +119,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 24),
               TextButton(
-                onPressed: () {
-                 
-                },
+                onPressed: () {},
                 child: Text(
                   "ESQUECI A SENHA",
                   style: TextStyle(

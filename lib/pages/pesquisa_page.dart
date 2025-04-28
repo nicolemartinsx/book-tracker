@@ -8,40 +8,36 @@ class SearchPage extends StatefulWidget {
 
   @override
   State<SearchPage> createState() => _SearchPageState();
-  
 }
 
 class _SearchPageState extends State<SearchPage> {
+  final TextEditingController searchController = TextEditingController();
 
+  List<Livro> allBooks = LivroRepository.livros;
+  List<Livro> searchResults = [];
 
-final TextEditingController searchController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    searchResults = allBooks.take(5).toList(); // Mostra 5 livros logo de cara
+  }
 
-List<Livro> allBooks = LivroRepository.livros;
-List<Livro> searchResults = [];
+  void _searchBooks() {
+    String query = searchController.text.trim().toLowerCase();
 
-
-@override
-void initState() {
-  super.initState();
-  searchResults = allBooks.take(5).toList(); // Mostra 5 livros logo de cara
-}
-
-
-void _searchBooks() {
-  String query = searchController.text.trim().toLowerCase();
-
-  setState(() {
-    if (query.isEmpty) {
-      searchResults = allBooks.take(5).toList();
-    } else {
-      searchResults = allBooks.where((livro) {
-        return livro.titulo.toLowerCase().contains(query) ||
-               livro.autor.toLowerCase().contains(query) ||
-               livro.id.contains(query);
-      }).toList();
-    }
-  });
-}
+    setState(() {
+      if (query.isEmpty) {
+        searchResults = allBooks.take(5).toList();
+      } else {
+        searchResults =
+            allBooks.where((livro) {
+              return livro.titulo.toLowerCase().contains(query) ||
+                  livro.autor.toLowerCase().contains(query) ||
+                  livro.id.contains(query);
+            }).toList();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,20 +74,6 @@ void _searchBooks() {
                   ),
                 ),
                 SizedBox(width: 16),
-              
-              
-             /*   ElevatedButton(
-                  onPressed: _searchBooks,  //função lá em cima
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    backgroundColor: Colors.blueGrey[900],
-                    padding: EdgeInsets.symmetric(vertical: 13),
-                  ),
-                  child: Icon(Icons.search, color: Colors.white, size: 30),
-                ), 
-            */
               ],
             ),
 
@@ -101,14 +83,14 @@ void _searchBooks() {
                 itemCount: searchResults.length,
                 itemBuilder: (context, index) {
                   final livro = searchResults[index];
-                return ListTile(
-                  title: Text(livro.titulo),
-                  subtitle: Text(livro.autor),
-                  onTap: () {
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                  builder: (context) => LivroDetalhePage(livro: livro),
+                  return ListTile(
+                    title: Text(livro.titulo),
+                    subtitle: Text(livro.autor),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LivroDetalhePage(livro: livro),
                         ),
                       );
                     },

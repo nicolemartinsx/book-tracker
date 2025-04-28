@@ -1,5 +1,4 @@
 import 'package:book_tracker/app_bar.dart';
-import 'package:book_tracker/pages/estante_page.dart';
 import 'package:book_tracker/pages/home_page.dart';
 import 'package:book_tracker/pages/login_page.dart';
 import 'package:book_tracker/services/auth_service.dart';
@@ -14,35 +13,29 @@ class CadastroPage extends StatefulWidget {
 }
 
 class _CadastroPageState extends State<CadastroPage> {
-
   final loginController = TextEditingController();
   final nameController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
   bool _obscureText = true;
 
-
-
-
   registrar() async {
-    try{
-      await context.read<AuthService>().registrar(loginController.text, senhaController.text, nameController.text);
+    try {
+      await context.read<AuthService>().registrar(
+        loginController.text,
+        senhaController.text,
+        nameController.text,
+      );
 
-
-        Navigator.pushReplacement(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
       );
-
-    }on AuthException catch(e){
-       ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(e.message) ));
+    } on AuthException catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
     }
-
   }
-
-
-
-
 
   void _toggleVisibility() {
     setState(() {

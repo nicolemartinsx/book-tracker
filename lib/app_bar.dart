@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-PreferredSizeWidget buildCustomAppBar(String title) {
+PreferredSizeWidget buildCustomAppBar(String title, [Function()? logout]) {
   return AppBar(
     centerTitle: true,
     title: Row(
@@ -18,5 +18,10 @@ PreferredSizeWidget buildCustomAppBar(String title) {
       fontWeight: FontWeight.bold,
       color: Colors.black87,
     ),
+
+    actions: [
+      if (logout != null)
+        IconButton(onPressed: logout, icon: Icon(Icons.output_outlined)),
+    ],
   );
 }
