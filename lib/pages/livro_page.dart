@@ -1,19 +1,102 @@
+import 'package:book_tracker/models/estante.dart';
 import 'package:book_tracker/pages/review_page.dart';
+import 'package:book_tracker/repositories/estante_repository.dart';
 import 'package:book_tracker/repositories/review_repository.dart';
 import 'package:book_tracker/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:book_tracker/models/livro.dart';
 import 'package:provider/provider.dart';
 
-class LivroDetalhePage extends StatelessWidget {
+class LivroDetalhePage extends StatefulWidget {
   final Livro livro;
 
   const LivroDetalhePage({super.key, required this.livro});
 
   @override
+  State<LivroDetalhePage> createState() => _LivroDetalhePageState();
+}
+
+class _LivroDetalhePageState extends State<LivroDetalhePage> {
+  @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
     final usuario = authService.usuario?.uid;
+    final estante = EstanteRepository.getLivro(widget.livro.id);
+
+    void showBottomSheet(BuildContext context) {
+      showModalBottomSheet(
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        backgroundColor: Colors.white,
+        builder: (BuildContext context) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Adicionar à Estante',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+
+                ListTile(
+                  leading: Icon(Icons.menu_book, color: Colors.teal),
+                  title: Text('Lendo'),
+                  onTap: () {
+                    EstanteRepository.adicionarLivro(
+                      Estante(
+                        livro: widget.livro,
+                        statusLivro: StatusLivro.lendo,
+                      ),
+                    );
+
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.check_circle_sharp, color: Colors.teal),
+                  title: Text('Lido'),
+                  onTap: () {
+                    EstanteRepository.adicionarLivro(
+                      Estante(
+                        livro: widget.livro,
+                        statusLivro: StatusLivro.lido,
+                      ),
+                    );
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.bookmark_add, color: Colors.teal),
+                  title: Text('Quero Ler'),
+                  onTap: () {
+                    EstanteRepository.adicionarLivro(
+                      Estante(
+                        livro: widget.livro,
+                        statusLivro: StatusLivro.queroLer,
+                      ),
+                    );
+                    Navigator.pop(context);
+                  },
+                ),
+                if (estante != null)
+                  ListTile(
+                    leading: Icon(Icons.delete, color: Colors.red[300]),
+                    title: Text('Remover'),
+                    onTap: () {
+                      EstanteRepository.removerLivro(estante);
+                      Navigator.pop(context);
+                    },
+                  ),
+              ],
+            ),
+          );
+        },
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.grey[50], // igual a SearchPage
@@ -39,7 +122,7 @@ class LivroDetalhePage extends StatelessWidget {
                 height: 300,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(livro.icone),
+                    image: AssetImage(widget.livro.icone),
                     fit: BoxFit.cover,
                   ),
                   borderRadius: BorderRadius.circular(10),
@@ -51,7 +134,7 @@ class LivroDetalhePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  livro.titulo,
+                  widget.livro.titulo,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -60,7 +143,7 @@ class LivroDetalhePage extends StatelessWidget {
                 ),
 
                 Text(
-                  livro.autor,
+                  widget.livro.autor,
                   style: TextStyle(fontSize: 18, color: Colors.black54),
                 ),
                 SizedBox(height: 22),
@@ -72,39 +155,30 @@ class LivroDetalhePage extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    final authService = Provider.of<AuthService>(
-                      context,
-                      listen: false,
-                    );
-                    if (authService.usuario != null) {
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Você precisa estar logado para realizar esta ação.',
-                          ),
-                          backgroundColor: Colors.redAccent,
-                        ),
-                      );
-                    }
+                    showBottomSheet(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueGrey[900],
+                    backgroundColor: Colors.teal,
 
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: Text(
-                    'Adicionar',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    estante == null
+                        ? 'Adicionar'
+                        : estante.statusLivro.name.toUpperCase(),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
 
                 SizedBox(width: 20),
                 OutlinedButton(
                   onPressed: () {
-                    if (ReviewRepository.hasReviewed(livro.id, usuario!)) {
+                    if (ReviewRepository.hasReviewed(
+                      widget.livro.id,
+                      usuario!,
+                    )) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Você já resenhou este livro.'),
@@ -117,8 +191,8 @@ class LivroDetalhePage extends StatelessWidget {
                         MaterialPageRoute(
                           builder:
                               (context) => ReviewPage(
-                                idLivro: livro.id,
-                                livroTitulo: livro.titulo,
+                                idLivro: widget.livro.id,
+                                livroTitulo: widget.livro.titulo,
                               ),
                         ),
                       );
@@ -141,7 +215,7 @@ class LivroDetalhePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 26),
               child: Text(
-                livro.sinopse,
+                widget.livro.sinopse,
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.justify,
               ),
