@@ -1,10 +1,16 @@
+import 'package:book_tracker/pages/review_page.dart';
+import 'package:book_tracker/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:book_tracker/models/livro.dart';
+import 'package:provider/provider.dart';
 
 class LivroDetalhePage extends StatelessWidget {
-  final Livro livro;
 
+
+  final Livro livro;
+ 
   const LivroDetalhePage({super.key, required this.livro});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +46,7 @@ class LivroDetalhePage extends StatelessWidget {
                 color: Colors.black54,
               ),
             ),
-
-               SizedBox(height: 16),
+          SizedBox(height: 16),
             Container(
               height: 100, 
               color: Colors.grey[200], 
@@ -56,7 +61,20 @@ class LivroDetalhePage extends StatelessWidget {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // ação de adicionar
+                  final authService = Provider.of<AuthService>(context, listen: false);
+
+                if (authService.usuario != null) //usado para verificar se o usuario está logado
+                {
+                  //Ação de adicionar
+                } 
+                else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Você precisa estar logado para realizar esta ação.'),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  ); 
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueGrey[900],
@@ -76,7 +94,24 @@ class LivroDetalhePage extends StatelessWidget {
             SizedBox(height: 16),
             OutlinedButton(
               onPressed: () {
-                // ação de fazer resenha
+                 final authService = Provider.of<AuthService>(context, listen: false);
+
+                if (authService.usuario != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReviewPage(livroTitulo: livro.titulo),
+                    ),
+                  );
+                } else {
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Você precisa estar logado para realizar esta ação.'),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  ); 
+                }
               },
               style: OutlinedButton.styleFrom(
                 backgroundColor: Colors.white,
