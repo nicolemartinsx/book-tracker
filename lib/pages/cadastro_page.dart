@@ -13,6 +13,9 @@ class CadastroPage extends StatefulWidget {
 }
 
 class _CadastroPageState extends State<CadastroPage> {
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   final loginController = TextEditingController();
   final nameController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
@@ -51,9 +54,11 @@ class _CadastroPageState extends State<CadastroPage> {
       body: Center(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
+          child:Form(
+          key:_formKey,
           child: Column(
             children: [
-              TextField(
+              TextFormField(
                 controller: loginController,
                 decoration: InputDecoration(
                   labelText: 'Email',
@@ -63,9 +68,20 @@ class _CadastroPageState extends State<CadastroPage> {
                   ),
                 ),
                 onTapOutside: (event) => FocusScope.of(context).unfocus(),
+
+                validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, insira o seu email';
+                }
+                if (!value.contains('@')) {
+                  return 'Email inválido';
+                }
+                return null; // se estiver tudo certo, retorna null
+                },
+
               ),
               SizedBox(height: 24),
-              TextField(
+              TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(
                   labelText: 'Username',
@@ -77,7 +93,7 @@ class _CadastroPageState extends State<CadastroPage> {
                 onTapOutside: (event) => FocusScope.of(context).unfocus(),
               ),
               SizedBox(height: 24),
-              TextField(
+              TextFormField(
                 controller: senhaController,
                 obscureText: _obscureText,
                 decoration: InputDecoration(
@@ -94,11 +110,43 @@ class _CadastroPageState extends State<CadastroPage> {
                   ),
                 ),
                 onTapOutside: (event) => FocusScope.of(context).unfocus(),
+
+                
+                validator: (value) {
+                      if (value == null || value.isEmpty) {
+                      return 'Por favor, insira uma senha.';
+                      }
+
+                     if (value.length < 6) {
+                     return 'A senha deve ter pelo menos 6 caracteres.';
+                     }
+
+                    if (!RegExp(r'[0-9]').hasMatch(value)) {
+                    return 'A senha deve conter pelo menos um número.';
+                    }
+
+                    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                    return 'A senha deve conter pelo menos uma letra maiúscula.';
+                    }
+
+                    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                      return 'A senha deve conter pelo menos um caractere especial.';
+                    }
+                    return null;
+
+                },
+
               ),
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
+                  if (_formKey.currentState!.validate()) {
                   registrar();
+                  }else{
+                    ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Por favor, corrija os erros acima.')),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueGrey[900],
@@ -118,10 +166,15 @@ class _CadastroPageState extends State<CadastroPage> {
               SizedBox(height: 24),
               TextButton(
                 onPressed: () {
-                  Navigator.push(
+
+
+                  Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => LoginPage()),
+                    (Route<dynamic> route) => false,
                   );
+
+
                 },
                 child: Text(
                   "Já tem uma conta? Faça login",
@@ -134,6 +187,7 @@ class _CadastroPageState extends State<CadastroPage> {
                 ),
               ),
             ],
+          ),
           ),
         ),
       ),
