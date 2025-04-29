@@ -35,7 +35,7 @@ class _ReviewPageState extends State<ReviewPage> {
       if (ReviewRepository.hasReviewed(widget.idLivro, usuario!)) {
         final review = ReviewRepository.getReview(widget.idLivro, usuario);
         _tituloController.text = review.titulo;
-        _conteudoController.text = review.titulo;
+        _conteudoController.text = review.conteudo;
         setState(() {
           rating = double.parse(review.estrelas);
         });
@@ -77,7 +77,7 @@ class _ReviewPageState extends State<ReviewPage> {
         ),
       );
 
-      Navigator.pop(context); // Volta para a tela anterior
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
