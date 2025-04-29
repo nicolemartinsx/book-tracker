@@ -12,6 +12,7 @@ class BookshelfPage extends StatefulWidget {
 
 class _BookshelfPageState extends State<BookshelfPage> {
   List<Estante> estante = [];
+  StatusLivro? filtroSelecionado;
 
   @override
   void initState() {
@@ -25,6 +26,15 @@ class _BookshelfPageState extends State<BookshelfPage> {
     });
   }
 
+  List<Estante> get livrosFiltrados {
+    if (filtroSelecionado == null) {
+      return estante;
+    }
+    return estante
+        .where((item) => item.statusLivro == filtroSelecionado)
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,6 +42,24 @@ class _BookshelfPageState extends State<BookshelfPage> {
       body: SafeArea(
         child: Column(
           children: [
+            SizedBox(height: 12),
+            Text(
+              'Sua Estante',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  _buildFiltroChip('Todos', null),
+                  _buildFiltroChip('Lendo', StatusLivro.lendo),
+                  _buildFiltroChip('Lido', StatusLivro.lido),
+                  _buildFiltroChip('Quero Ler', StatusLivro.queroLer),
+                ],
+              ),
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -45,23 +73,22 @@ class _BookshelfPageState extends State<BookshelfPage> {
                     mainAxisSpacing: 16,
                     childAspectRatio: 0.6,
                   ),
-                  itemCount: estante.length,
+                  itemCount: livrosFiltrados.length,
                   itemBuilder: (context, index) {
+                    final livro = livrosFiltrados[index].livro;
                     return InkWell(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder:
-                                (context) => LivroDetalhePage(
-                                  livro: estante[index].livro,
-                                ),
+                                (context) => LivroDetalhePage(livro: livro),
                           ),
                         ).then((_) {
                           _carregarLivros();
                         });
                       },
-                      borderRadius: BorderRadius.circular(10),
+
                       child: Container(
                         margin: EdgeInsets.symmetric(vertical: 18),
                         width: 200,
@@ -69,10 +96,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
                           borderRadius: BorderRadius.circular(10),
                           child: AspectRatio(
                             aspectRatio: 2 / 3,
-                            child: Image.asset(
-                              estante[index].livro.icone,
-                              fit: BoxFit.cover,
-                            ),
+                            child: Image.asset(livro.icone, fit: BoxFit.cover),
                           ),
                         ),
                       ),
@@ -82,6 +106,26 @@ class _BookshelfPageState extends State<BookshelfPage> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFiltroChip(String label, StatusLivro? status) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: FilterChip(
+        label: Text(label),
+        selected: filtroSelecionado == status,
+        onSelected: (_) {
+          setState(() {
+            filtroSelecionado = status;
+          });
+        },
+        selectedColor: Colors.teal,
+        showCheckmark: false,
+        labelStyle: TextStyle(
+          color: filtroSelecionado == status ? Colors.white : Colors.black,
         ),
       ),
     );
