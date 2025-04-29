@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "645845102508",
-    "project_id": "book-tracker-c2144",
-    "storage_bucket": "book-tracker-c2144.firebasestorage.app"
+    "project_number": "476397795087",
+    "project_id": "book-tracker-ea674",
+    "storage_bucket": "book-tracker-ea674.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:645845102508:android:b4e6f280ebb2e2ac7b9409",
+        "mobilesdk_app_id": "1:476397795087:android:83e1e4dbad3ca86c45b07a",
         "android_client_info": {
           "package_name": "com.example.book_tracker"
         }
@@ -15,7 +15,26 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyB0HLz6F6Q7CIYRnfuDnN7yrTMrSCzAqFI"
+          "current_key": "AIzaSyC_mrLN5DsBrH7hfwiBj0br9q0JA_6_I7k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:476397795087:android:2c2f838a2f32e69b45b07a",
+        "android_client_info": {
+          "package_name": "com.exemplo.book_tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_mrLN5DsBrH7hfwiBj0br9q0JA_6_I7k"
         }
       ],
       "services": {

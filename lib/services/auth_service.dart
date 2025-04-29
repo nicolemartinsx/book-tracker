@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AuthException implements Exception {
@@ -57,6 +58,14 @@ class AuthService extends ChangeNotifier {
 
       // Atualiza o nome do usuário no perfil
       await userCredential.user!.updateDisplayName(nome);
+
+      await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(userCredential.user!.uid)
+          .set({
+        'nome': nome,
+        'email': email,
+      });
 
       // Atualiza o usuário no app também
       await userCredential.user!.reload();

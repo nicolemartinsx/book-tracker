@@ -43,4 +43,13 @@ class LivroRepository {
           'Geralt de Rívia, um caçador de monstros conhecido como "Witcher", luta contra criaturas e humanos em um mundo sombrio e moralmente ambíguo. Ao longo de suas aventuras, ele se vê preso em uma teia de política, magia e destino, enquanto tenta proteger aqueles que ama e enfrentar uma guerra iminente.',
     ),
   ];
+
+  static Future<Livro> getLivroById(String idLivro) async {
+    final livro = livros.firstWhere(
+          (livro) => livro.id == idLivro,
+      orElse: () => throw Exception('Livro com id $idLivro não encontrado'),
+    );
+    return Future.value(livro);
+  }
+
 }
