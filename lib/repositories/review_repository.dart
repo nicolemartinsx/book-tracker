@@ -14,4 +14,10 @@ class ReviewRepository {
       (review) => review.idLivro == livroId && review.autor == usuario,
     );
   }
+
+  static Review getReview(String livroId, String usuario) {
+    return _reviews.firstWhere(
+      (review) => review.idLivro == livroId && review.autor == usuario,
+    );
+  }
 }
