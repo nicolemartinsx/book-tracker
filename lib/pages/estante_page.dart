@@ -1,4 +1,6 @@
-import 'package:book_tracker/pages/login_page.dart';
+import 'package:book_tracker/models/estante.dart';
+import 'package:book_tracker/pages/livro_page.dart';
+import 'package:book_tracker/repositories/estante_repository.dart';
 import 'package:flutter/material.dart';
 
 class BookshelfPage extends StatefulWidget {
@@ -9,45 +11,122 @@ class BookshelfPage extends StatefulWidget {
 }
 
 class _BookshelfPageState extends State<BookshelfPage> {
+  List<Estante> estante = [];
+  StatusLivro? filtroSelecionado;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarLivros();
+  }
+
+  void _carregarLivros() {
+    setState(() {
+      estante = EstanteRepository.estante;
+    });
+  }
+
+  List<Estante> get livrosFiltrados {
+    if (filtroSelecionado == null) {
+      return estante;
+    }
+    return estante
+        .where((item) => item.statusLivro == filtroSelecionado)
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(5, 200, 5, 25),
-            child: Center(
-              child: Text(
-                'Acesse sua conta para visualizar sua estante',
-                style: TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
+      body: SafeArea(
+        child: Column(
+          children: [
+            SizedBox(height: 12),
+            Text(
+              'Sua Estante',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  _buildFiltroChip('Todos', null),
+                  _buildFiltroChip('Lendo', StatusLivro.lendo),
+                  _buildFiltroChip('Lido', StatusLivro.lido),
+                  _buildFiltroChip('Quero Ler', StatusLivro.queroLer),
+                ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 20,
                 ),
-                backgroundColor: Colors.blueGrey[900],
-                padding: EdgeInsets.fromLTRB(20, 12, 20, 12),
-              ),
-              child: Text(
-                'Faça Login ou Cadastre-se',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.6,
+                  ),
+                  itemCount: livrosFiltrados.length,
+                  itemBuilder: (context, index) {
+                    final livro = livrosFiltrados[index].livro;
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => LivroDetalhePage(livro: livro),
+                          ),
+                        ).then((_) {
+                          _carregarLivros();
+                        });
+                      },
+
+                      child: Container(
+                        margin: EdgeInsets.symmetric(vertical: 18),
+                        width: 200,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: AspectRatio(
+                            aspectRatio: 2 / 3,
+                            child: Image.asset(livro.icone, fit: BoxFit.cover),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFiltroChip(String label, StatusLivro? status) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: FilterChip(
+        label: Text(label),
+        selected: filtroSelecionado == status,
+        onSelected: (_) {
+          setState(() {
+            filtroSelecionado = status;
+          });
+        },
+        selectedColor: Colors.teal,
+        showCheckmark: false,
+        labelStyle: TextStyle(
+          color: filtroSelecionado == status ? Colors.white : Colors.black,
+        ),
       ),
     );
   }

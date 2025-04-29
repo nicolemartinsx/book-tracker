@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 24),
-              TextButton(
+              /* TextButton(
                 onPressed: () {},
                 child: Text(
                   "ESQUECI A SENHA",
@@ -129,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                     decorationColor: Colors.teal,
                   ),
                 ),
-              ),
+              ), */
               TextButton(
                 onPressed: () {
                   Navigator.pushAndRemoveUntil(

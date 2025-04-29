@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:book_tracker/models/review.dart';
 
 class ReviewRepository {
@@ -6,8 +5,14 @@ class ReviewRepository {
 
   static List<Review> get reviews => _reviews;
 
-  static Future<void> addReview(Review review) async {
-    _reviews.add(review);
+  static void addReview(Review review) {
+    if (!hasReviewed(review.idLivro, review.autor)) {
+      _reviews.add(review);
+    } else {
+      Review? estanteLivro = getReview(review.idLivro, review.autor);
+      removerReview(estanteLivro);
+      _reviews.add(review);
+    }
     await FirebaseFirestore.instance.collection('reviews').add({
       'idLivro': review.idLivro,
       'titulo': review.titulo,
@@ -16,6 +21,10 @@ class ReviewRepository {
       'conteudo': review.conteudo,
       'data': Timestamp.now(),
     });
+  }
+
+  static void removerReview(Review review) {
+    _reviews.remove(review);
   }
 
   static Future<List<Review>> getReviews(String? idLivro) async {
@@ -32,6 +41,12 @@ class ReviewRepository {
 
   static bool hasReviewed(String livroId, String usuario) {
     return _reviews.any(
+      (review) => review.idLivro == livroId && review.autor == usuario,
+    );
+  }
+
+  static Review getReview(String livroId, String usuario) {
+    return _reviews.firstWhere(
       (review) => review.idLivro == livroId && review.autor == usuario,
     );
   }

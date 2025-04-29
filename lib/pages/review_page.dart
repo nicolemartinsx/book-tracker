@@ -27,6 +27,23 @@ class _ReviewPageState extends State<ReviewPage> {
   double rating = 0.0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final usuario = authService.usuario?.uid;
+      if (ReviewRepository.hasReviewed(widget.idLivro, usuario!)) {
+        final review = ReviewRepository.getReview(widget.idLivro, usuario);
+        _tituloController.text = review.titulo;
+        _conteudoController.text = review.conteudo;
+        setState(() {
+          rating = double.parse(review.estrelas);
+        });
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _tituloController.dispose();
     _conteudoController.dispose();
@@ -53,14 +70,20 @@ class _ReviewPageState extends State<ReviewPage> {
 
     try {
       //a configuração do firestore deve ficar aqui.
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Resenha enviada com sucesso!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Resenha enviada com sucesso!'),
+          backgroundColor: Colors.teal,
+        ),
+      );
 
-      Navigator.pop(context); // Volta para a tela anterior
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao enviar resenha. Tente novamente.')),
+        SnackBar(
+          content: Text('Erro ao enviar resenha. Tente novamente.'),
+          backgroundColor: Colors.orangeAccent,
+        ),
       );
     }
   }
