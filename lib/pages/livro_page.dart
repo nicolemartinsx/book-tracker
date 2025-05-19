@@ -148,10 +148,14 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                 width: 200,
                 height: 300,
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(widget.livro.icone),
-                    fit: BoxFit.cover,
-                  ),
+                  image:
+                      widget.livro.capa.isNotEmpty
+                          ? DecorationImage(
+                            image: NetworkImage(widget.livro.capa),
+                            fit: BoxFit.cover,
+                          )
+                          : null,
+                  color: widget.livro.capa.isEmpty ? Colors.grey[300] : null,
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -160,12 +164,16 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  widget.livro.titulo,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                  child: Text(
+                    widget.livro.titulo.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
 
@@ -193,7 +201,7 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                   ),
                   child: Text(
                     textoBotao,
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
 
@@ -206,7 +214,7 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                           content: Text(
                             'Você precisa ler o livro para adicionar uma resenha',
                           ),
-                          backgroundColor: Colors.orangeAccent,
+                          backgroundColor: Colors.amber[900],
                         ),
                       );
                     } else {
@@ -241,6 +249,34 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                   ),
                 ),
               ],
+            ),
+            SizedBox(height: 20),
+            Container(
+              width: 350,
+              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+
+              child: Row(
+                spacing: 8,
+                children: [
+                  Icon(Icons.store_outlined, size: 24),
+                  Expanded(
+                    child: Text(
+                      widget.livro.editora,
+                      style: TextStyle(fontSize: 16),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Icon(Icons.calendar_today_outlined, size: 22),
+                  Text(widget.livro.ano, style: TextStyle(fontSize: 16)),
+
+                  Icon(Icons.auto_stories_outlined, size: 22),
+                  Text(widget.livro.paginas, style: TextStyle(fontSize: 16)),
+                ],
+              ),
             ),
 
             Padding(

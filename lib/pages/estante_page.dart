@@ -96,7 +96,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
                           borderRadius: BorderRadius.circular(10),
                           child: AspectRatio(
                             aspectRatio: 2 / 3,
-                            child: Image.asset(livro.icone, fit: BoxFit.cover),
+                            child: Image.network(livro.capa, fit: BoxFit.cover),
                           ),
                         ),
                       ),
