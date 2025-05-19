@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:book_tracker/models/review.dart';
 import 'package:book_tracker/repositories/review_repository.dart';
@@ -27,24 +26,29 @@ class _FeedPageState extends State<FeedPage> {
   }
 
   Future<List<Review>> _loadData() async {
-
     final reviews = ReviewRepository.reviews;
 
     final livroFutures = <Future<void>>[];
     final autorFutures = <Future<void>>[];
 
     for (final review in reviews) {
-      livroFutures.add(LivroRepository.getLivroById(review.idLivro).then((livro) {
-        _livrosMap[review.idLivro] = livro;
-      }).catchError((_) {
+      livroFutures.add(
+        LivroRepository.getLivroById(review.idLivro)
+            .then((livro) {
+              _livrosMap[review.idLivro] = livro;
+            })
+            .catchError((_) {}),
+      );
 
-      }));
-
-      autorFutures.add(UserRepository.buscarNomeAutor(review.autor).then((nome) {
-        _autoresMap[review.autor] = nome;
-      }).catchError((_) {
-        _autoresMap[review.autor] = 'Autor desconhecido';
-      }));
+      autorFutures.add(
+        UserRepository.buscarNomeAutor(review.autor)
+            .then((nome) {
+              _autoresMap[review.autor] = nome;
+            })
+            .catchError((_) {
+              _autoresMap[review.autor] = 'Autor desconhecido';
+            }),
+      );
     }
 
     await Future.wait([...livroFutures, ...autorFutures]);
@@ -55,17 +59,6 @@ class _FeedPageState extends State<FeedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text('Feed de Resenhas'),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
-        titleTextStyle: const TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
       body: FutureBuilder<List<Review>>(
         future: _futureReviews,
         builder: (context, snapshot) {
@@ -79,7 +72,12 @@ class _FeedPageState extends State<FeedPage> {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Nenhuma resenha encontrada.'));
+            return const Center(
+              child: Text(
+                'Sem resenhas disponíveis',
+                style: TextStyle(fontSize: 18),
+              ),
+            );
           }
 
           final reviews = snapshot.data!;
@@ -107,7 +105,7 @@ class _FeedPageState extends State<FeedPage> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Image.asset(
-                            livro.icone,
+                            livro.capa,
                             height: 120,
                             width: 80,
                             fit: BoxFit.cover,
