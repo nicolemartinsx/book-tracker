@@ -71,21 +71,17 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Busque Livros',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
+            SizedBox(height: 15),
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: searchController,
                     decoration: InputDecoration(
-                      hintText: "Pesquisa pelo Titúlo",
+                      hintText: "Encontre seus livros favoritos!",
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.black87, width: 2),
+                        borderSide: BorderSide(color: Colors.black87, width: 1),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.teal, width: 3),
@@ -104,7 +100,7 @@ class _SearchPageState extends State<SearchPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    backgroundColor: Colors.blueGrey[900],
+                    backgroundColor: Colors.blueGrey[800],
                     padding: EdgeInsets.symmetric(vertical: 13),
                   ),
                   child: Icon(Icons.search, color: Colors.white, size: 30),

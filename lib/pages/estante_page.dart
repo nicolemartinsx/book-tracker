@@ -42,11 +42,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: 12),
-            Text(
-              'Sua Estante',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+            Divider(thickness: 1),
             SizedBox(height: 12),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -60,6 +56,7 @@ class _BookshelfPageState extends State<BookshelfPage> {
                 ],
               ),
             ),
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
