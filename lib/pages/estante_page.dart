@@ -1,7 +1,9 @@
 import 'package:book_tracker/models/estante.dart';
 import 'package:book_tracker/pages/livro_page.dart';
 import 'package:book_tracker/repositories/estante_repository.dart';
+import 'package:book_tracker/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BookshelfPage extends StatefulWidget {
   const BookshelfPage({super.key});
@@ -14,16 +16,33 @@ class _BookshelfPageState extends State<BookshelfPage> {
   List<Estante> estante = [];
   StatusLivro? filtroSelecionado;
 
+    String? _usuario;
+
   @override
   void initState() {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    _usuario = authService.usuario?.uid;
+    
     super.initState();
     _carregarLivros();
   }
 
-  void _carregarLivros() {
-    setState(() {
-      estante = EstanteRepository.estante;
-    });
+
+  void _carregarLivros() async {
+  if (_usuario != null) {
+    try {
+      final livros = await EstanteRepository.getTodosLivrosPorUsuario(_usuario!);
+      setState(() {
+        estante = livros;
+      });
+    } catch (e) {
+      print('Erro ao carregar livros: $e');
+      // Você pode mostrar um Snackbar ou um diálogo de erro aqui
+    }
+    } else {
+      print('Usuário não autenticado');
+      // Trate o caso de usuário não autenticado, se necessário
+    }
   }
 
   List<Estante> get livrosFiltrados {

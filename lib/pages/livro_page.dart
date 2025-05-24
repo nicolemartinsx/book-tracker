@@ -17,6 +17,40 @@ class LivroDetalhePage extends StatefulWidget {
 }
 
 class _LivroDetalhePageState extends State<LivroDetalhePage> {
+
+    String? _usuario;
+    Estante? _estante;                   
+    bool _temReview = false;             
+    bool _carregando = true;             
+    String _textoBotao = 'Adicionar';    
+
+  @override
+  void initState() {
+    super.initState();
+    final authService = Provider.of<AuthService>(context, listen: false);
+    _usuario = authService.usuario?.uid;
+
+    _carregarDados();                 
+  }
+
+  Future<void> _carregarDados() async {
+    //final authService = Provider.of<AuthService>(context, listen: false);
+    //final usuario = authService.usuario?.uid;
+
+    
+    final estante = await EstanteRepository.getLivro(widget.livro.id,_usuario!);
+    final temReview = await ReviewRepository.hasReviewed(widget.livro.id, _usuario!);
+
+    
+    setState(() {
+      _estante = estante;
+      _temReview = temReview;
+      _textoBotao = getTextoStatus(estante?.statusLivro);
+       print('Status do livro: ${_estante}');
+      _carregando = false;
+    });
+  }
+
   String getTextoStatus(StatusLivro? status) {
     switch (status) {
       case StatusLivro.lendo:
@@ -32,11 +66,21 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
 
   @override
   Widget build(BuildContext context) {
+    
+    if (_carregando) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+  
+  /*
     final authService = Provider.of<AuthService>(context, listen: false);
     final usuario = authService.usuario?.uid;
     final estante = EstanteRepository.getLivro(widget.livro.id);
     var temReview = ReviewRepository.hasReviewed(widget.livro.id, usuario!);
     var textoBotao = getTextoStatus(estante?.statusLivro);
+  */
+
 
     void showBottomSheet(BuildContext context) {
       showModalBottomSheet(
@@ -61,61 +105,68 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                   leading: Icon(Icons.menu_book, color: Colors.teal),
                   title: Text('Lendo'),
                   onTap: () {
+                    if(_usuario!=null){
                     EstanteRepository.adicionarLivro(
                       Estante(
                         livro: widget.livro,
                         statusLivro: StatusLivro.lendo,
-                      ),
+                      ), _usuario!
                     );
                     setState(() {
-                      textoBotao = getTextoStatus(StatusLivro.lendo);
+                      _textoBotao = getTextoStatus(StatusLivro.lendo);
                     });
-
                     Navigator.pop(context);
+                    }
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.check_circle_sharp, color: Colors.teal),
                   title: Text('Lido'),
                   onTap: () {
+                       if(_usuario!=null){
                     EstanteRepository.adicionarLivro(
                       Estante(
                         livro: widget.livro,
                         statusLivro: StatusLivro.lido,
-                      ),
+                      ),_usuario!
                     );
                     setState(() {
-                      textoBotao = getTextoStatus(StatusLivro.lido);
+                      _textoBotao = getTextoStatus(StatusLivro.lido);
                     });
                     Navigator.pop(context);
+                  }
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.bookmark_add, color: Colors.teal),
                   title: Text('Quero Ler'),
                   onTap: () {
+                    if(_usuario!=null){
                     EstanteRepository.adicionarLivro(
                       Estante(
                         livro: widget.livro,
                         statusLivro: StatusLivro.queroLer,
-                      ),
+                      ),_usuario!
                     );
                     setState(() {
-                      textoBotao = getTextoStatus(StatusLivro.queroLer);
+                      _textoBotao = getTextoStatus(StatusLivro.queroLer);
                     });
                     Navigator.pop(context);
+                  }
                   },
                 ),
-                if (estante != null)
+                if (_estante != null)
                   ListTile(
                     leading: Icon(Icons.delete, color: Colors.red[300]),
                     title: Text('Remover'),
                     onTap: () {
-                      EstanteRepository.removerLivro(estante);
-                      setState(() {
-                        textoBotao = getTextoStatus(null);
-                      });
-                      Navigator.pop(context);
+                      if (_estante != null) {
+                        EstanteRepository.removerLivro(_estante!);
+                        setState(() {
+                          _textoBotao = getTextoStatus(null);
+                        });
+                        Navigator.pop(context);
+                      }
                     },
                   ),
               ],
@@ -200,7 +251,7 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                     ),
                   ),
                   child: Text(
-                    textoBotao,
+                    _textoBotao,
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
@@ -208,7 +259,7 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                 SizedBox(width: 20),
                 OutlinedButton(
                   onPressed: () {
-                    if (estante?.statusLivro != StatusLivro.lido) {
+                    if (_estante?.statusLivro != StatusLivro.lido) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -229,10 +280,12 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                         ),
                       ).then((_) {
                         setState(() {
-                          temReview = ReviewRepository.hasReviewed(
+                          if(_usuario!=null){                          
+                          _temReview = ReviewRepository.hasReviewed(
                             widget.livro.id,
-                            usuario,
+                            _usuario!,
                           );
+                          }
                         });
                       });
                     }
@@ -244,7 +297,7 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                     ),
                   ),
                   child: Text(
-                    temReview ? 'Editar Resenha' : 'Criar Resenha',
+                    _temReview ? 'Editar Resenha' : 'Criar Resenha',
                     style: TextStyle(fontSize: 16, color: Colors.blueGrey[900]),
                   ),
                 ),

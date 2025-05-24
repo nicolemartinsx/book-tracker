@@ -54,4 +54,32 @@ class Livro {
       sinopse: volumeInfo['description'] ?? 'Sem Descrição',
     );
   }
+
+factory Livro.fromMap(Map<String, dynamic> map) {
+    return Livro(
+      id: map['id'] ?? '',
+      isbn: map['isbn'] ?? '',
+      titulo: map['titulo'] ?? '',
+      autor: map['autor'] ?? '',
+      editora: map['editora'] ?? '',
+      ano: map['ano'] ?? '',
+      paginas: map['paginas'] ?? '',
+      capa: map['capa'] ?? '',
+      sinopse: map['sinopse'] ?? '',
+    );
+  }
+  /// ✅ Método para Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'isbn': isbn,
+      'titulo': titulo,
+      'autor': autor,
+      'editora': editora,
+      'ano': ano,
+      'paginas': paginas,
+      'capa': capa,
+      'sinopse': sinopse,
+    };
+  }
 }
