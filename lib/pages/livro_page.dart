@@ -51,6 +51,20 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
     });
   }
 
+
+      void _verificarSeTemReview() async {
+        if (_usuario != null) {
+          final temReview = await ReviewRepository.hasReviewed(
+            widget.livro.id,
+            _usuario!,
+          );
+          setState(() {
+            _temReview = temReview;
+          });
+        }
+      }
+
+
   String getTextoStatus(StatusLivro? status) {
     switch (status) {
       case StatusLivro.lendo:
@@ -281,10 +295,7 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                       ).then((_) {
                         setState(() {
                           if(_usuario!=null){                          
-                          _temReview = ReviewRepository.hasReviewed(
-                            widget.livro.id,
-                            _usuario!,
-                          );
+                          _verificarSeTemReview(); // set state não pode ser assincrona então eu tive que criar a função
                           }
                         });
                       });

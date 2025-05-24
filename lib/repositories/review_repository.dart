@@ -7,11 +7,13 @@ class ReviewRepository {
   static List<Review> get reviews => _reviews;
 
   static void addReview(Review review) async {
-    if (!hasReviewed(review.idLivro, review.autor)) {
+    bool reviewExiste = await hasReviewed(review.idLivro, review.autor);
+    if (!reviewExiste) {
+      
       _reviews.add(review);
     } else {
-      Review? estanteLivro = getReview(review.idLivro, review.autor);
-      removerReview(estanteLivro);
+      Review? estanteLivro = await getReview(review.idLivro, review.autor);
+      await removerReview(estanteLivro!);
       _reviews.add(review);
     }
      await FirebaseFirestore.instance.collection('reviews').add({
@@ -24,8 +26,18 @@ class ReviewRepository {
     }); 
   }
 
-  static void removerReview(Review review) {
+  static Future<void> removerReview(Review review) async {
     _reviews.remove(review);
+
+    final query = await FirebaseFirestore.instance
+      .collection('reviews')
+      .where('idLivro', isEqualTo: review.idLivro)
+      .where('autor', isEqualTo: review.autor)
+      .get();
+
+    for (var doc in query.docs) {
+    await FirebaseFirestore.instance.collection('reviews').doc(doc.id).delete();
+      }
   }
 
    static Future<List<Review>> getReviews(String? idLivro) async {
@@ -42,15 +54,31 @@ class ReviewRepository {
         .toList();
   }
  
-  static bool hasReviewed(String livroId, String usuario) {
-    return _reviews.any(
-      (review) => review.idLivro == livroId && review.autor == usuario,
-    );
+  static Future<bool> hasReviewed(String livroId, String usuario) async {
+
+     final query = await FirebaseFirestore.instance
+      .collection('reviews')
+      .where('idLivro', isEqualTo: livroId)
+      .where('autor', isEqualTo: usuario)
+      .limit(1)
+      .get();
+
+      return query.docs.isNotEmpty;
+
   }
 
-  static Review getReview(String livroId, String usuario) {
-    return _reviews.firstWhere(
-      (review) => review.idLivro == livroId && review.autor == usuario,
-    );
+  static Future<Review?> getReview(String livroId, String usuario) async {
+    final query = await FirebaseFirestore.instance
+      .collection('reviews')
+      .where('idLivro', isEqualTo: livroId)
+      .where('autor', isEqualTo: usuario)
+      .limit(1)
+      .get();
+
+    if (query.docs.isNotEmpty) {
+      return Review.fromMap(query.docs.first.data());
+    } else {
+      return null;
+    }
   }
 }

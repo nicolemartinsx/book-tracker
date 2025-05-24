@@ -29,19 +29,30 @@ class _ReviewPageState extends State<ReviewPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      final usuario = authService.usuario?.uid;
-      if (ReviewRepository.hasReviewed(widget.idLivro, usuario!)) {
-        final review = ReviewRepository.getReview(widget.idLivro, usuario);
+    _carregarReviewSeExistir();
+
+  }
+
+  void _carregarReviewSeExistir() { //função para deixar mais organizado
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final usuario = authService.usuario?.uid;
+
+    if (usuario == null) return;
+
+    if (await ReviewRepository.hasReviewed(widget.idLivro, usuario)) {
+      final review = await ReviewRepository.getReview(widget.idLivro, usuario);
+      if (review != null) {
         _tituloController.text = review.titulo;
         _conteudoController.text = review.conteudo;
         setState(() {
           rating = double.parse(review.estrelas);
         });
       }
-    });
+    }
+  });
   }
+
 
   @override
   void dispose() {
