@@ -28,9 +28,13 @@ class AuthService extends ChangeNotifier {
 
   login(String email, String senha) async {
     try {
+      print('[AUTH] Tentando login...');
+
       await _auth.signInWithEmailAndPassword(email: email, password: senha);
+      print('[AUTH] Login bem-sucedido!');
       getUser();
     } on FirebaseAuthException catch (e) {
+        print('[AUTH] Erro no login: ${e.code}');
       if (e.code == 'user-not-found') {
         throw AuthException('Email não encontrado');
       } else if (e.code == 'wrong-password') {
@@ -39,7 +43,9 @@ class AuthService extends ChangeNotifier {
         throw AuthException('Preencha todos os campos');
       } else if (e.code == 'invalid-email') {
         throw AuthException('Email inválido');
-      }
+      } else {
+      throw AuthException('Erro desconhecido: ${e.message}');
+    }
     }
   }
 
@@ -50,13 +56,12 @@ class AuthService extends ChangeNotifier {
 
   registrar(String email, String senha, String nome) async {
     try {
-      //await _auth.createUserWithEmailAndPassword(email: email, password: senha);
-      //_getUser();
+      
 
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: senha);
 
-      // Atualiza o nome do usuário no perfil
+    
       await userCredential.user!.updateDisplayName(nome);
 
       await FirebaseFirestore.instance
@@ -67,7 +72,7 @@ class AuthService extends ChangeNotifier {
         'email': email,
       });
 
-      // Atualiza o usuário no app também
+      
       await userCredential.user!.reload();
       getUser();
     } on FirebaseAuthException catch (e) {
@@ -83,4 +88,43 @@ class AuthService extends ChangeNotifier {
     usuario = _auth.currentUser;
     notifyListeners();
   }
+
+   Future<void> alterarNomeUsuario(String novoNome) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      await user.updateDisplayName(novoNome);
+      await user.reload();
+    } else {
+      throw Exception('Usuário não está logado.');
+    }
+  }
+
+   // Reautenticação
+  Future<void> reautenticarUsuario(String email, String senhaAtual) async {
+    final user = _auth.currentUser;
+    final cred = EmailAuthProvider.credential(email: email, password: senhaAtual);
+
+    if (user != null) {
+      await user.reauthenticateWithCredential(cred);
+    } else {
+      throw Exception('Usuário não está logado.');
+    }
+  }
+
+  // Alterar senha com reautenticação
+  Future<void> atualizarSenhaComReautenticacao(
+      String email, String senhaAtual, String novaSenha) async {
+    await reautenticarUsuario(email, senhaAtual);
+    await alterarSenha(novaSenha);
+  }
+
+  Future<void> alterarSenha(String novaSenha) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      await user.updatePassword(novaSenha);
+    } else {
+      throw Exception('Usuário não está logado.');
+    }
+  }
+
 }

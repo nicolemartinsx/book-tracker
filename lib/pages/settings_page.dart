@@ -1,5 +1,6 @@
 import 'package:book_tracker/pages/login_page.dart';
 import 'package:book_tracker/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +12,9 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+
+  final authService = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,15 +34,103 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           SizedBox(height: 16),
           ListTile(
-            leading: Icon(Icons.person_outline, color: Colors.teal),
-            title: Text('Alterar nome de usuário'),
-            onTap: () {},
+              leading: Icon(Icons.person_outline, color: Colors.teal),
+  title: Text('Alterar nome de usuário'),
+  onTap: () {
+    final nomeController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Novo nome de usuário'),
+        content: TextField(
+          controller: nomeController,
+          decoration: InputDecoration(hintText: 'Digite o novo nome'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              try {
+                await authService.alterarNomeUsuario(nomeController.text.trim());
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Nome de usuário atualizado com sucesso!')),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Erro: ${e.toString()}')),
+                );
+              }
+            },
+            child: Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+  },
           ),
           Divider(),
           ListTile(
-            leading: Icon(Icons.lock_outline, color: Colors.teal),
-            title: Text('Alterar senha'),
-            onTap: () {},
+             leading: Icon(Icons.lock_outline, color: Colors.teal),
+  title: Text('Alterar senha'),
+  onTap: () {
+              final senhaAtualController = TextEditingController();
+              final novaSenhaController = TextEditingController();
+
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Alterar senha'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: senhaAtualController,
+                        obscureText: true,
+                        decoration: InputDecoration(labelText: 'Senha atual'),
+                      ),
+                      TextField(
+                        controller: novaSenhaController,
+                        obscureText: true,
+                        decoration: InputDecoration(labelText: 'Nova senha'),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        try {
+                          final user = FirebaseAuth.instance.currentUser!;
+                          final email = user.email!;
+                          await authService.atualizarSenhaComReautenticacao(
+                            email,
+                            senhaAtualController.text.trim(),
+                            novaSenhaController.text.trim(),
+                          );
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Senha alterada com sucesso!')),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Erro: ${e.toString()}')),
+                          );
+                        }
+                      },
+                      child: Text('Salvar'),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
           Divider(),
           ListTile(
