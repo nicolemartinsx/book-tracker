@@ -1,12 +1,14 @@
+import 'package:book_tracker/models/livro.dart';
+
 class Review {
-  String idLivro;
+  Livro livro;
   String estrelas;
   String titulo;
   String autor;
   String conteudo;
 
   Review({
-    required this.idLivro,
+    required this.livro,
     required this.titulo,
     required this.estrelas,
     required this.autor,
@@ -15,7 +17,7 @@ class Review {
 
   factory Review.fromMap(Map<String, dynamic> map) {
     return Review(
-      idLivro: map['idLivro'] ?? '',
+      livro: Livro.fromMap(map['livro']),
       titulo: map['titulo'] ?? '',
       estrelas: map['estrelas'] ?? '',
       autor: map['autor'] ?? '',

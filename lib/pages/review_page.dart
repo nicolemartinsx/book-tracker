@@ -1,3 +1,4 @@
+import 'package:book_tracker/models/livro.dart';
 import 'package:book_tracker/models/review.dart';
 import 'package:book_tracker/services/auth_service.dart';
 import 'package:flutter/material.dart';
@@ -5,17 +6,10 @@ import 'package:book_tracker/repositories/review_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.dart';
 
-//import 'package:cloud_firestore/cloud_firestore.dart';
-
 class ReviewPage extends StatefulWidget {
-  final String idLivro;
-  final String livroTitulo;
+  final Livro livro;
 
-  const ReviewPage({
-    super.key,
-    required this.idLivro,
-    required this.livroTitulo,
-  });
+  const ReviewPage({super.key, required this.livro});
 
   @override
   State<ReviewPage> createState() => _ReviewPageState();
@@ -30,29 +24,31 @@ class _ReviewPageState extends State<ReviewPage> {
   void initState() {
     super.initState();
     _carregarReviewSeExistir();
-
   }
 
-  void _carregarReviewSeExistir() { //função para deixar mais organizado
-  WidgetsBinding.instance.addPostFrameCallback((_) async {
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final usuario = authService.usuario?.uid;
+  void _carregarReviewSeExistir() {
+    //função para deixar mais organizado
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final usuario = authService.usuario?.uid;
 
-    if (usuario == null) return;
+      if (usuario == null) return;
 
-    if (await ReviewRepository.hasReviewed(widget.idLivro, usuario)) {
-      final review = await ReviewRepository.getReview(widget.idLivro, usuario);
-      if (review != null) {
-        _tituloController.text = review.titulo;
-        _conteudoController.text = review.conteudo;
-        setState(() {
-          rating = double.parse(review.estrelas);
-        });
+      if (await ReviewRepository.hasReviewed(widget.livro.id, usuario)) {
+        final review = await ReviewRepository.getReview(
+          widget.livro.id,
+          usuario,
+        );
+        if (review != null) {
+          _tituloController.text = review.titulo;
+          _conteudoController.text = review.conteudo;
+          setState(() {
+            rating = double.parse(review.estrelas);
+          });
+        }
       }
-    }
-  });
+    });
   }
-
 
   @override
   void dispose() {
@@ -69,9 +65,9 @@ class _ReviewPageState extends State<ReviewPage> {
       return;
     }
 
-    ReviewRepository.addReview(
+    await ReviewRepository.addReview(
       Review(
-        idLivro: widget.idLivro,
+        livro: widget.livro,
         titulo: _tituloController.text,
         estrelas: rating.toString(),
         autor: context.read<AuthService>().usuario!.uid,
@@ -79,23 +75,24 @@ class _ReviewPageState extends State<ReviewPage> {
       ),
     );
 
-    try {
-      //a configuração do firestore deve ficar aqui.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Resenha enviada com sucesso!'),
-          backgroundColor: Colors.teal,
-        ),
-      );
+    if (mounted) {
+      try {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Resenha enviada com sucesso!'),
+            backgroundColor: Colors.teal,
+          ),
+        );
 
-      Navigator.pop(context);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao enviar resenha. Tente novamente.'),
-          backgroundColor: Colors.orangeAccent,
-        ),
-      );
+        Navigator.pop(context);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao enviar resenha. Tente novamente.'),
+            backgroundColor: Colors.orangeAccent,
+          ),
+        );
+      }
     }
   }
 
@@ -120,7 +117,7 @@ class _ReviewPageState extends State<ReviewPage> {
           child: Column(
             children: [
               Text(
-                widget.livroTitulo,
+                widget.livro.titulo,
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,

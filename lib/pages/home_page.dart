@@ -48,9 +48,21 @@ class _HomePageState extends State<HomePage> {
         unselectedItemColor: Colors.blueGrey[500],
         currentIndex: paginaAtual,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Feed'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Pesquisa'),
-          BottomNavigationBarItem(icon: Icon(Icons.shelves), label: 'Estante'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Feed',
+            backgroundColor: Colors.grey[50],
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Pesquisa',
+            backgroundColor: Colors.grey[50],
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shelves),
+            label: 'Estante',
+            backgroundColor: Colors.grey[50],
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Perfil',

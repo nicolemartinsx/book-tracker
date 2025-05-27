@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:book_tracker/models/livro.dart';
 import 'package:book_tracker/pages/livro_page.dart';
-import 'package:book_tracker/repositories/livro_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,7 +15,6 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController searchController = TextEditingController();
 
-  List<Livro> allBooks = LivroRepository.livros;
   List<Livro> searchResults = [];
 
   ConnectionState status = ConnectionState.none;

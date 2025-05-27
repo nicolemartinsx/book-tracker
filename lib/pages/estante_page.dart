@@ -16,29 +16,30 @@ class _BookshelfPageState extends State<BookshelfPage> {
   List<Estante> estante = [];
   StatusLivro? filtroSelecionado;
 
-    String? _usuario;
+  String? _usuario;
 
   @override
   void initState() {
     final authService = Provider.of<AuthService>(context, listen: false);
     _usuario = authService.usuario?.uid;
-    
+
     super.initState();
     _carregarLivros();
   }
 
-
   void _carregarLivros() async {
-  if (_usuario != null) {
-    try {
-      final livros = await EstanteRepository.getTodosLivrosPorUsuario(_usuario!);
-      setState(() {
-        estante = livros;
-      });
-    } catch (e) {
-      print('Erro ao carregar livros: $e');
-      // Você pode mostrar um Snackbar ou um diálogo de erro aqui
-    }
+    if (_usuario != null) {
+      try {
+        final livros = await EstanteRepository.getTodosLivrosPorUsuario(
+          _usuario!,
+        );
+        setState(() {
+          estante = livros;
+        });
+      } catch (e) {
+        print('Erro ao carregar livros: $e');
+        // Você pode mostrar um Snackbar ou um diálogo de erro aqui
+      }
     } else {
       print('Usuário não autenticado');
       // Trate o caso de usuário não autenticado, se necessário
@@ -139,6 +140,8 @@ class _BookshelfPageState extends State<BookshelfPage> {
           });
         },
         selectedColor: Colors.teal,
+        backgroundColor: Colors.grey[50],
+
         showCheckmark: false,
         labelStyle: TextStyle(
           color: filtroSelecionado == status ? Colors.white : Colors.black,

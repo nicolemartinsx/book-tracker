@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:book_tracker/models/review.dart';
 import 'package:book_tracker/repositories/review_repository.dart';
 import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.dart';
-
-import '../models/livro.dart';
-import '../repositories/livro_repository.dart';
 import '../repositories/user_repository.dart';
 
 class FeedPage extends StatefulWidget {
@@ -16,7 +13,6 @@ class FeedPage extends StatefulWidget {
 
 class _FeedPageState extends State<FeedPage> {
   late Future<List<Review>> _futureReviews;
-  final Map<String, Livro> _livrosMap = {};
   final Map<String, String> _autoresMap = {};
 
   @override
@@ -26,20 +22,11 @@ class _FeedPageState extends State<FeedPage> {
   }
 
   Future<List<Review>> _loadData() async {
-    final reviews = ReviewRepository.reviews;
+    final reviews = await ReviewRepository.getReviews(null);
 
-    final livroFutures = <Future<void>>[];
     final autorFutures = <Future<void>>[];
 
     for (final review in reviews) {
-      livroFutures.add(
-        LivroRepository.getLivroById(review.idLivro)
-            .then((livro) {
-              _livrosMap[review.idLivro] = livro;
-            })
-            .catchError((_) {}),
-      );
-
       autorFutures.add(
         UserRepository.buscarNomeAutor(review.autor)
             .then((nome) {
@@ -51,7 +38,7 @@ class _FeedPageState extends State<FeedPage> {
       );
     }
 
-    await Future.wait([...livroFutures, ...autorFutures]);
+    await Future.wait([...autorFutures]);
     return reviews;
   }
 
@@ -87,10 +74,10 @@ class _FeedPageState extends State<FeedPage> {
             itemCount: reviews.length,
             itemBuilder: (context, index) {
               final review = reviews[index];
-              final livro = _livrosMap[review.idLivro];
               final autor = _autoresMap[review.autor] ?? 'Autor desconhecido';
 
               return Card(
+                color: Colors.grey[200],
                 margin: const EdgeInsets.only(bottom: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -101,11 +88,11 @@ class _FeedPageState extends State<FeedPage> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (livro != null)
+                      if (review.livro.capa.isNotEmpty)
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.asset(
-                            livro.capa,
+                          child: Image.network(
+                            review.livro.capa,
                             height: 120,
                             width: 80,
                             fit: BoxFit.cover,
@@ -115,7 +102,7 @@ class _FeedPageState extends State<FeedPage> {
                         Container(
                           width: 80,
                           height: 120,
-                          color: Colors.grey[300],
+                          color: Colors.grey[200],
                           child: const Icon(Icons.book, size: 40),
                         ),
                       const SizedBox(width: 16),
@@ -124,7 +111,7 @@ class _FeedPageState extends State<FeedPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              livro?.titulo ?? 'Livro não encontrado',
+                              review.livro.titulo,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

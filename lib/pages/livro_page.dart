@@ -17,12 +17,11 @@ class LivroDetalhePage extends StatefulWidget {
 }
 
 class _LivroDetalhePageState extends State<LivroDetalhePage> {
-
-    String? _usuario;
-    Estante? _estante;                   
-    bool _temReview = false;             
-    bool _carregando = true;             
-    String _textoBotao = 'Adicionar';    
+  String? _usuario;
+  Estante? _estante;
+  bool _temReview = false;
+  bool _carregando = true;
+  String _textoBotao = 'Adicionar';
 
   @override
   void initState() {
@@ -30,40 +29,40 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
     final authService = Provider.of<AuthService>(context, listen: false);
     _usuario = authService.usuario?.uid;
 
-    _carregarDados();                 
+    _carregarDados();
   }
 
   Future<void> _carregarDados() async {
-    //final authService = Provider.of<AuthService>(context, listen: false);
-    //final usuario = authService.usuario?.uid;
+    final estante = await EstanteRepository.getLivro(
+      widget.livro.id,
+      _usuario!,
+    );
+    final temReview = await ReviewRepository.hasReviewed(
+      widget.livro.id,
+      _usuario!,
+    );
 
-    
-    final estante = await EstanteRepository.getLivro(widget.livro.id,_usuario!);
-    final temReview = await ReviewRepository.hasReviewed(widget.livro.id, _usuario!);
-
-    
     setState(() {
       _estante = estante;
       _temReview = temReview;
       _textoBotao = getTextoStatus(estante?.statusLivro);
-       print('Status do livro: ${_estante}');
+      print('Status do livro: ${_estante}');
       _carregando = false;
     });
   }
 
-
-      void _verificarSeTemReview() async {
-        if (_usuario != null) {
-          final temReview = await ReviewRepository.hasReviewed(
-            widget.livro.id,
-            _usuario!,
-          );
-          setState(() {
-            _temReview = temReview;
-          });
-        }
-      }
-
+  void _verificarSeTemReview() async {
+    if (_usuario != null) {
+      final temReview = await ReviewRepository.hasReviewed(
+        widget.livro.id,
+        _usuario!,
+      );
+      print('Tem reivew ${_temReview}');
+      setState(() {
+        _temReview = temReview;
+      });
+    }
+  }
 
   String getTextoStatus(StatusLivro? status) {
     switch (status) {
@@ -80,21 +79,9 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
 
   @override
   Widget build(BuildContext context) {
-    
     if (_carregando) {
-      return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-  
-  /*
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final usuario = authService.usuario?.uid;
-    final estante = EstanteRepository.getLivro(widget.livro.id);
-    var temReview = ReviewRepository.hasReviewed(widget.livro.id, usuario!);
-    var textoBotao = getTextoStatus(estante?.statusLivro);
-  */
-
 
     void showBottomSheet(BuildContext context) {
       showModalBottomSheet(
@@ -119,18 +106,18 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                   leading: Icon(Icons.menu_book, color: Colors.teal),
                   title: Text('Lendo'),
                   onTap: () {
-                    if(_usuario!=null){
-                    EstanteRepository.adicionarLivro(
-                      Estante(
+                    if (_usuario != null) {
+                      final novaEstante = Estante(
                         livro: widget.livro,
                         statusLivro: StatusLivro.lendo,
-                        userId:_usuario!
-                      ), _usuario!
-                    );
-                    setState(() {
-                      _textoBotao = getTextoStatus(StatusLivro.lendo);
-                    });
-                    Navigator.pop(context);
+                        userId: _usuario!,
+                      );
+                      EstanteRepository.adicionarLivro(novaEstante, _usuario!);
+                      setState(() {
+                        _estante = novaEstante;
+                        _textoBotao = getTextoStatus(StatusLivro.lendo);
+                      });
+                      Navigator.pop(context);
                     }
                   },
                 ),
@@ -138,38 +125,38 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                   leading: Icon(Icons.check_circle_sharp, color: Colors.teal),
                   title: Text('Lido'),
                   onTap: () {
-                       if(_usuario!=null){
-                    EstanteRepository.adicionarLivro(
-                      Estante(
+                    if (_usuario != null) {
+                      final novaEstante = Estante(
                         livro: widget.livro,
                         statusLivro: StatusLivro.lido,
-                        userId:_usuario!
-                      ),_usuario!
-                    );
-                    setState(() {
-                      _textoBotao = getTextoStatus(StatusLivro.lido);
-                    });
-                    Navigator.pop(context);
-                  }
+                        userId: _usuario!,
+                      );
+                      EstanteRepository.adicionarLivro(novaEstante, _usuario!);
+                      setState(() {
+                        _estante = novaEstante;
+                        _textoBotao = getTextoStatus(StatusLivro.lido);
+                      });
+                      Navigator.pop(context);
+                    }
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.bookmark_add, color: Colors.teal),
                   title: Text('Quero Ler'),
                   onTap: () {
-                    if(_usuario!=null){
-                    EstanteRepository.adicionarLivro(
-                      Estante(
+                    if (_usuario != null) {
+                      final novaEstante = Estante(
                         livro: widget.livro,
                         statusLivro: StatusLivro.queroLer,
-                        userId:_usuario!
-                      ),_usuario!
-                    );
-                    setState(() {
-                      _textoBotao = getTextoStatus(StatusLivro.queroLer);
-                    });
-                    Navigator.pop(context);
-                  }
+                        userId: _usuario!,
+                      );
+                      EstanteRepository.adicionarLivro(novaEstante, _usuario!);
+                      setState(() {
+                        _estante = novaEstante;
+                        _textoBotao = getTextoStatus(StatusLivro.queroLer);
+                      });
+                      Navigator.pop(context);
+                    }
                   },
                 ),
                 if (_estante != null)
@@ -180,6 +167,8 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                       if (_estante != null) {
                         EstanteRepository.removerLivro(_estante!);
                         setState(() {
+                          _estante = null;
+                          _temReview = false;
                           _textoBotao = getTextoStatus(null);
                         });
                         Navigator.pop(context);
@@ -289,18 +278,10 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (context) => ReviewPage(
-                                idLivro: widget.livro.id,
-                                livroTitulo: widget.livro.titulo,
-                              ),
+                          builder: (context) => ReviewPage(livro: widget.livro),
                         ),
                       ).then((_) {
-                        setState(() {
-                          if(_usuario!=null){                          
-                          _verificarSeTemReview(); // set state não pode ser assincrona então eu tive que criar a função
-                          }
-                        });
+                        _verificarSeTemReview();
                       });
                     }
                   },

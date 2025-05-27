@@ -19,7 +19,7 @@ class Estante {
       statusLivro: StatusLivro.values.firstWhere(
         (e) => e.toString() == 'StatusLivro.${map['statusLivro']}',
       ),
-      userId: map['userId'] ?? '', // Certifique-se que esse campo exista no Firestore
+      userId: map['userId'] ?? '',
     );
   }
 
