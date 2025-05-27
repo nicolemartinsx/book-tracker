@@ -1,15 +1,55 @@
+import 'package:book_tracker/models/ReviewComLivro.dart';
+import 'package:book_tracker/models/review.dart';
 import 'package:book_tracker/pages/settings_page.dart';
+import 'package:book_tracker/repositories/review_repository.dart';
+import 'package:book_tracker/services/auth_service.dart';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
-}
+
+  }
+
+
+
+  Future<List<Review>> _buscarResenhasDoUsuario(String autor) 
+  {
+  return ReviewRepository.getReviewsByAutor(autor);
+  }
+
+
 
 class _ProfilePageState extends State<ProfilePage> {
+  
+   
+
+  String? _usuarioId;
+  String? _nomeUsuario;
+  //late Future<List<Review>> _futureResenhas;
+  late Future<List<ReviewComLivro>> _futureReviewsComLivro;
+
+        @override
+        void initState() {
+          super.initState();
+          final authService = Provider.of<AuthService>(context, listen: false);
+          _usuarioId = authService.usuario?.uid;
+          _nomeUsuario = authService.usuario?.displayName ?? 'Usuário';
+
+          if (_usuarioId != null) {
+            _futureReviewsComLivro = ReviewRepository.buscarReviewsComLivros(_usuarioId!);
+          }
+        }
+
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -33,7 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   SizedBox(width: 20),
                   Text(
-                    'nomedousuario',
+                      _nomeUsuario ?? 'Não funcionou!!!', 
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(width: 55),
@@ -67,11 +107,49 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
 
-                  Center(
-                    child: Text(
-                      'Suas resenhas aparecerão aqui',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                        // Resenhas
+                 FutureBuilder<List<ReviewComLivro>>(
+                    future: _futureReviewsComLivro,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Erro ao carregar resenhas'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(child: Text('Você ainda não escreveu resenhas.'));
+                      } else {
+                        final lista = snapshot.data!;
+                        return ListView.builder(
+                          itemCount: lista.length,
+                          itemBuilder: (context, index) {
+                            final item = lista[index];
+                            final review = item.review;
+                            final livro = item.livro;
+
+                            return ListTile(
+                              leading: livro.capa.isNotEmpty
+                                  ? Image.network(livro.capa, width: 50, height: 75, fit: BoxFit.cover)
+                                  : Icon(Icons.book, size: 50),
+                              title: Text(livro.titulo),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(review.conteudo),
+                                  SizedBox(height: 4),
+                                  Row(
+                                    children: List.generate(
+                                      int.tryParse(review.estrelas.toString()) ?? 0,
+                                      (i) => Icon(Icons.star, color: Colors.amber, size: 16),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              isThreeLine: true,
+                            );
+                          },
+                        );
+                      }
+                    },
                   ),
                 ],
               ),

@@ -1,4 +1,5 @@
 import 'package:book_tracker/models/estante.dart';
+import 'package:book_tracker/repositories/review_repository.dart';
 import 'package:book_tracker/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -72,7 +73,10 @@ try{
     final query = await FirebaseFirestore.instance
       .collection('estante')
       .where('livro.id', isEqualTo: estante.livro.id)
+      .where('userId',isEqualTo: estante.userId)
       .get();
+
+    ReviewRepository.removerReviewPorEstante(estante);
 
     for (var doc in query.docs) {
     await FirebaseFirestore.instance.collection('estante').doc(doc.id).delete();

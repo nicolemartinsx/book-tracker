@@ -124,6 +124,7 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                       Estante(
                         livro: widget.livro,
                         statusLivro: StatusLivro.lendo,
+                        userId:_usuario!
                       ), _usuario!
                     );
                     setState(() {
@@ -142,6 +143,7 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                       Estante(
                         livro: widget.livro,
                         statusLivro: StatusLivro.lido,
+                        userId:_usuario!
                       ),_usuario!
                     );
                     setState(() {
@@ -160,6 +162,7 @@ class _LivroDetalhePageState extends State<LivroDetalhePage> {
                       Estante(
                         livro: widget.livro,
                         statusLivro: StatusLivro.queroLer,
+                        userId:_usuario!
                       ),_usuario!
                     );
                     setState(() {
