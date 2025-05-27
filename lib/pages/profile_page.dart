@@ -5,6 +5,7 @@ import 'package:book_tracker/services/auth_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -103,50 +104,83 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Text('Você ainda não escreveu resenhas.'),
                         );
                       } else {
-                        final lista = snapshot.data!;
+                        final reviews = snapshot.data!;
                         return ListView.builder(
-                          itemCount: lista.length,
+                          padding: const EdgeInsets.all(16),
+                          itemCount: reviews.length,
                           itemBuilder: (context, index) {
-                            final item = lista[index];
-                            final review = item.review;
-                            final livro = item.livro;
+                            final review = reviews[index];
 
-                            return ListTile(
-                              leading:
-                                  livro.capa.isNotEmpty
-                                      ? Image.network(
-                                        livro.capa,
-                                        height: 60,
-                                        //width: 80,
-                                        fit: BoxFit.cover,
-                                      )
-                                      : Icon(Icons.book, size: 50),
-                              title: Text(
-                                livro.titulo,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            return Card(
+                              color: Colors.grey[50],
+                              margin: const EdgeInsets.only(bottom: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(review.conteudo),
-                                  SizedBox(height: 6),
-                                  Row(
-                                    children: List.generate(
-                                      (double.tryParse(review.estrelas) ?? 0)
-                                          .toInt(),
-                                      (i) => Icon(
-                                        Icons.star,
-                                        color: Colors.teal,
-                                        size: 18,
+
+                              child: Padding(
+                                padding: const EdgeInsets.all(14.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (review.livro.capa.isNotEmpty)
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          review.livro.capa,
+                                          height: 100,
+                                          width: 70,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    else
+                                      Container(
+                                        width: 80,
+                                        height: 120,
+                                        color: Colors.grey[200],
+                                        child: const Icon(Icons.book, size: 40),
+                                      ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            review.livro.titulo,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+
+                                          const SizedBox(height: 8),
+                                          SmoothStarRating(
+                                            rating:
+                                                double.tryParse(
+                                                  review.review.estrelas,
+                                                ) ??
+                                                0.0,
+                                            starCount: 5,
+                                            size: 18,
+                                            color: Colors.teal,
+                                            borderColor: Colors.teal,
+                                            allowHalfRating: true,
+                                            spacing: 2.0,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            review.review.conteudo,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                              isThreeLine: true,
                             );
                           },
                         );
