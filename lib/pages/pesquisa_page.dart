@@ -2,7 +2,10 @@ import 'dart:convert';
 
 import 'package:book_tracker/models/livro.dart';
 import 'package:book_tracker/pages/livro_page.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+
 import 'package:flutter/material.dart';
+
 import 'package:http/http.dart' as http;
 
 class SearchPage extends StatefulWidget {
@@ -19,22 +22,31 @@ class _SearchPageState extends State<SearchPage> {
 
   ConnectionState status = ConnectionState.none;
 
+  Future<void> escanearCodigoDeBarras() async {
+    String isbn = await FlutterBarcodeScanner.scanBarcode(
+      '#ff6666',
+      'Cancelar',
+      true,
+      ScanMode.BARCODE,
+    );
+
+    if (isbn != '-1') {
+      buscarLivros('isbn:$isbn');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
   }
 
-  void buscarLivros() async {
-    String query = Uri.encodeComponent(
-      searchController.text.trim().toLowerCase(),
-    );
-
+  void buscarLivros(String query) async {
     setState(() {
       status = ConnectionState.waiting;
     });
 
     final url = Uri.parse(
-      'https://www.googleapis.com/books/v1/volumes?maxResults=10&orderBy=relevance&printType=books&q=intitle:${(query)}',
+      'https://www.googleapis.com/books/v1/volumes?maxResults=10&orderBy=relevance&printType=books&q=$query',
     );
 
     final response = await http.get(url);
@@ -89,19 +101,34 @@ class _SearchPageState extends State<SearchPage> {
                     onTapOutside: (event) => FocusScope.of(context).unfocus(),
                   ),
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: () {
-                    buscarLivros();
-                  },
+                  onPressed:
+                      () => buscarLivros(
+                        'intitle:${Uri.encodeComponent(searchController.text.trim().toLowerCase())}',
+                      ),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                     backgroundColor: Colors.blueGrey[800],
-                    padding: EdgeInsets.symmetric(vertical: 13),
+                    padding: EdgeInsets.all(13),
+                    minimumSize: Size(0, 0),
                   ),
-                  child: Icon(Icons.search, color: Colors.white, size: 30),
+                  child: Icon(Icons.search, color: Colors.white, size: 32),
+                ),
+                SizedBox(width: 4),
+                IconButton(
+                  icon: Icon(Icons.qr_code_scanner, size: 32),
+                  color: Colors.blueGrey,
+                  onPressed: escanearCodigoDeBarras,
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(width: 2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: EdgeInsets.all(13),
+                  ),
                 ),
               ],
             ),
