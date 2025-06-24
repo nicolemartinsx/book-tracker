@@ -2,6 +2,7 @@ import 'package:book_tracker/models/ReviewComLivro.dart';
 import 'package:book_tracker/pages/settings_page.dart';
 import 'package:book_tracker/repositories/review_repository.dart';
 import 'package:book_tracker/services/auth_service.dart';
+import 'package:book_tracker/services/foto_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,9 +13,11 @@ class ProfilePage extends StatefulWidget {
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
+  
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  String? _fotoUrl;
   String? _usuarioId;
   String? _nomeUsuario;
   //late Future<List<Review>> _futureResenhas;
@@ -23,9 +26,12 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+   
     final authService = Provider.of<AuthService>(context, listen: false);
     _usuarioId = authService.usuario?.uid;
     _nomeUsuario = authService.usuario?.displayName ?? 'Usuário';
+
+  _carregarFotoPerfil();//precisa ser aqui pq ele precisa pegar o uid
 
     if (_usuarioId != null) {
       _futureReviewsComLivro = ReviewRepository.buscarReviewsComLivros(
@@ -34,8 +40,20 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _carregarFotoPerfil() async {
+  //final userId = Provider.of<AuthService>(context, listen: false).usuario?.uid;
+  if (_usuarioId == null) return;
+
+  final url = await ImageUploadService.carregarFotoDePerfil(_usuarioId!);
+
+  setState(() {
+    _fotoUrl = url;
+  });
+}
+
   @override
   Widget build(BuildContext context) {
+    
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -49,11 +67,11 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: Colors.teal,
-                    radius: 35,
-                    backgroundImage: NetworkImage(
-                      'https://cdn-icons-png.flaticon.com/512/847/847969.png',
-                    ),
+                      backgroundColor: Colors.teal,
+                      radius: 35,
+                      backgroundImage: _fotoUrl != null
+                          ? NetworkImage(_fotoUrl!)
+                          : NetworkImage('https://cdn-icons-png.flaticon.com/512/847/847969.png'),
                   ),
                   SizedBox(width: 20),
                   Text(
@@ -66,6 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) => SettingsPage()),
                       );
+                      _carregarFotoPerfil();
                     },
                     icon: Icon(Icons.settings, size: 30, color: Colors.teal),
                   ),

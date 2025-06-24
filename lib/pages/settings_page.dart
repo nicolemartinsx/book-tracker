@@ -1,5 +1,6 @@
 import 'package:book_tracker/pages/login_page.dart';
 import 'package:book_tracker/services/auth_service.dart';
+import 'package:book_tracker/services/foto_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -136,7 +137,20 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             leading: Icon(Icons.photo_camera_outlined, color: Colors.teal),
             title: Text('Alterar foto de perfil'),
-            onTap: () {},
+               onTap: () async{
+              try{
+                final authService = Provider.of<AuthService>(context, listen: false);
+                 final _usuarioId = authService.usuario?.uid;
+    
+                await ImageUploadService.pickAndUploadImage(_usuarioId!);
+                SnackBar(content: Text('imagem atualizada com sucesso!'));
+              }catch(e){
+                ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Erro: ${e.toString()}')),
+                );
+              }
+    
+            },
           ),
           Divider(),
           ListTile(
