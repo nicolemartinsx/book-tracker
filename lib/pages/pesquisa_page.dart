@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:book_tracker/models/livro.dart';
 import 'package:book_tracker/pages/livro_page.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-
+import 'package:book_tracker/pages/scanner_page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
@@ -22,16 +21,20 @@ class _SearchPageState extends State<SearchPage> {
 
   ConnectionState status = ConnectionState.none;
 
-  Future<void> escanearCodigoDeBarras() async {
-    String isbn = await FlutterBarcodeScanner.scanBarcode(
-      '#ff6666',
-      'Cancelar',
-      true,
-      ScanMode.BARCODE,
+  void openScanner() async {
+    final result = await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: const ScannerPage(),
+        );
+      },
     );
 
-    if (isbn != '-1') {
-      buscarLivros('isbn:$isbn');
+    if (result != null) {
+      buscarLivros('isbn:$result');
     }
   }
 
@@ -121,7 +124,7 @@ class _SearchPageState extends State<SearchPage> {
                 IconButton(
                   icon: Icon(Icons.qr_code_scanner, size: 32),
                   color: Colors.blueGrey,
-                  onPressed: escanearCodigoDeBarras,
+                  onPressed: openScanner,
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       side: BorderSide(width: 2),
